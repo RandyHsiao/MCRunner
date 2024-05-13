@@ -7,10 +7,19 @@ using System;
 
 namespace MCRunner.Strategy
 {
+    /// <summary>
+    /// Manages a strategy and its positions.
+    /// </summary>
     public class StrategyManager
     {
+        /// <summary>
+        /// Triggered after an order has been received and validated.
+        /// </summary>
         public event Action<OrderInfo> OrderValidated;
 
+        /// <summary>
+        /// Triggered when an order has been canceled.
+        /// </summary>
         public event Action<OrderInfo> OrderCanceled;
 
         private ImmutableHashSet<OrderInfo> previousSubmittedOrders =
@@ -23,6 +32,9 @@ namespace MCRunner.Strategy
         private readonly IPosition shortPosition = new ShortPosition();
         private readonly StrategyPerformance strategyInfo = new StrategyPerformance();
 
+        /// <summary>
+        /// Gets the current position size.
+        /// </summary>
         private int Size
         {
             get
@@ -31,6 +43,9 @@ namespace MCRunner.Strategy
             }
         }
 
+        /// <summary>
+        /// Retrieves the strategy performance information.
+        /// </summary>
         public IStrategyPerformance StrategyInfo
         {
             get
@@ -39,16 +54,31 @@ namespace MCRunner.Strategy
             }
         }
 
+        /// <summary>
+        /// Instantiates a new instance.
+        /// </summary>
+        /// <param name="orderCreator">The IOrderManaged to use to subscribe to
+        /// orders.</param>
         public StrategyManager(IOrderManaged orderCreator)
         {
             orderCreator.OrderSent += OnOrderSent;
         }
 
+        /// <summary>
+        /// Call to update the market position at broker.
+        /// </summary>
+        /// <param name="positionChange">The change in position.</param>
         public void UpdateMarketPositionAtBroker(double positionChange)
         {
             strategyInfo.UpdateMarketPositionAtBroker(positionChange);
         }
 
+        /// <summary>
+        /// Triggers any orders in the queue. Any orders that were submitted previously
+        /// but not re-submitted since the last call of this method will be canceled.
+        /// </summary>
+        /// <param name="bar">The latest Bar instance. The price data from this Bar is
+        /// used to see if any orders have been triggered.</param>
         public void TriggerOrders(Bar bar)
         {
             foreach (var order in untriggeredOrders)
@@ -89,6 +119,8 @@ namespace MCRunner.Strategy
                 }
             }
 
+            // Any orders that are in previousSubmittedOrders but not in untriggeredOrders
+            // were not resubmitted, and so should be canceled
             foreach (var order in previousSubmittedOrders)
             {
                 if (!untriggeredOrders.Contains(order))
@@ -101,6 +133,11 @@ namespace MCRunner.Strategy
             untriggeredOrders = untriggeredOrders.Clear();
         }
 
+        /// <summary>
+        /// Called when a new order is sent. Validates the order and registers for when
+        /// it's triggered.
+        /// </summary>
+        /// <param name="order">The information about the order that was sent.</param>
         private void OnOrderSent(OrderInfo order)
         {
             ValidateOrder(order);
@@ -114,6 +151,10 @@ namespace MCRunner.Strategy
             CheckIfOrderTriggered(order);
         }
 
+        /// <summary>
+        /// Called when a new order is triggered. Updates the strategy.
+        /// </summary>
+        /// <param name="order">The order that was triggered.</param>
         private void OnOrderTriggered(OrderInfo order)
         {
             switch (order.OrderAction)
@@ -134,11 +175,16 @@ namespace MCRunner.Strategy
 
             strategyInfo.MarketPosition = Size;
 
+            // No need to track orders after they're filled
             validatedOrders = validatedOrders.Remove(order);
             untriggeredOrders = untriggeredOrders.Remove(order);
             previousSubmittedOrders = previousSubmittedOrders.Remove(order);
         }
 
+        /// <summary>
+        /// Validates an order to ensure it is sane to send to the market.
+        /// </summary>
+        /// <param name="order">The order to validate.</param>
         private void ValidateOrder(OrderInfo order)
         {
             switch (order.OrderAction)
@@ -158,6 +204,10 @@ namespace MCRunner.Strategy
             }
         }
 
+        /// <summary>
+        /// If the order has a price condition, determines whether it has been triggered.
+        /// </summary>
+        /// <param name="order">The order to check if it has been triggered.</param>
         private void CheckIfOrderTriggered(OrderInfo order)
         {
             if (order.Order is IOrderMarket)

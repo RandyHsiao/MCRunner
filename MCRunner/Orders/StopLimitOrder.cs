@@ -3,13 +3,27 @@ using System;
 
 namespace MCRunner.Orders
 {
+    /// <summary>
+    /// Describes a stop-limit order.
+    /// </summary>
     public class StopLimitOrder : BaseOrder, IOrderStopLimit
     {
+        /// <summary>
+        /// Instantiates the order.
+        /// </summary>
+        /// <param name="orderParams">Parameters for the order.</param>
+        /// <param name="openNext">Indicates whether the order must be placed at the open
+        /// of next bar.</param>
         public StopLimitOrder(SOrderParameters orderParams, bool openNext = false)
             : base(orderParams, OrderCategory.StopLimit, openNext)
         {
         }
 
+        /// <summary>
+        /// Sends the order to the market.
+        /// </summary>
+        /// <param name="stopPrice">Order stop condition price.</param>
+        /// <param name="limitPrice">Order Limit price.</param>
         public void Send(double stopPrice, double limitPrice)
         {
             if (stopPrice <= 0)
@@ -33,6 +47,12 @@ namespace MCRunner.Orders
             });
         }
 
+        /// <summary>
+        /// Sends the order to the market.
+        /// </summary>
+        /// <param name="stopPrice">Order stop condition price.</param>
+        /// <param name="limitPrice">Order Limit price.</param>
+        /// <param name="numLots">Number of Lots.</param>
         public void Send(double stopPrice, double limitPrice, int numLots)
         {
             if (stopPrice <= 0)
