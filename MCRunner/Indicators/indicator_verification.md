@@ -38,11 +38,56 @@ project-root/
 ├── ...
 └── indicator_verification.md ← 本說明文件
 
-yaml
-複製
-編輯
+---
+
+## 🧪 驗證資料與 Python 運算行為說明
+
+已匯出一份指標驗證資料檔案：
+
+2330_1_Day_With_Indicators.csv
+
+此檔案為以 MultiCharts 執行五個指標（ADX、Bollinger Bands、MACD、Mov Avg 1 Line、RSI）後，透過於每個指標中加入 `Print` 指令所輸出。內容包含：
+
+- 原始歷史資料（Open, High, Low, Close, Volume...）  
+- 所有指標內部運算過程中輸出的中間值與最終值  
+- 每個指標可能輸出多個欄位（例如 Bollinger Bands 同時輸出中軌、上軌、下軌）
+
+其對應的原始歷史資料為：
+
+instruments/data/2330 1 Day.txt
+
+`.csv` 可視為該 `.txt` 資料集的擴充版本，用於比對驗證各個 Python 指標實作與 MultiCharts 結果是否一致。因檔案放置於 `indicators/` 資料夾下，故改以 `.csv` 儲存以避免與 `.txt` 混淆。
+
+
+## 📌 Python 指標驗證邏輯
+
+目標是：
+
+> 在不開啟 MultiCharts 的情況下，僅使用 `PY_*.py` 的官方 Python 版本指標程式碼，直接在本地執行，並比對 `.csv` 的結果。
+
+若能驗證一致，則可採用此程式碼為運算邏輯基底，改寫成 MCRunner 版本以進行回測。
 
 ---
+
+## ⚠️ 注意事項
+
+- `PY_*.py` 中多數使用 MultiCharts 提供的內建 `Function`（如 `PLFunction.ADX`），官方未公開其 Python 原始碼，推測是共用 .NET API 實作。
+- 在無法使用完整 MultiCharts 執行環境的情況下：
+  - 可**移除繪圖、Alerts 等 UI 功能**
+  - 僅保留運算邏輯
+  - 避免依賴 `ctx.AddPlot` 等無法執行的部分
+- 在 MCRunner 的 Python 架構中，建議**模擬 Function 行為並對照 `.csv` 值進行一致性驗證**
+
+---
+
+## 🔁 後續驗證建議
+
+- 撰寫 `test_indicator_accuracy.py` 腳本
+  - 讀取 `.csv` 的欄位與輸出
+  - 執行 `PY_*.py` 計算結果
+  - 比對每一行差異
+- 若有缺失的 Function，可在 MCRunner 寫 mock 模擬函式進行補齊
+
 
 ## 🧭 後續驗證建議
 
