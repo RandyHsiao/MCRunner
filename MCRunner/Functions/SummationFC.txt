@@ -1,0 +1,18 @@
+inputs: 
+	PriceValue( numericseries ), 
+	Len( numericsimple ) ;                                         
+
+variables: 
+	var0( 0 ) ;
+
+if CurrentBar = 1 then 
+	begin
+	for Value1 = 0 to Len - 1 
+		begin
+		var0 = var0 + PriceValue[Value1] ;
+		end ;
+	end
+else
+	var0 = var0[1] + PriceValue - PriceValue[Len] ;
+
+SummationFC = var0 ;

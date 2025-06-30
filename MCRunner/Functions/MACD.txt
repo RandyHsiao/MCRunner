@@ -1,0 +1,6 @@
+inputs: 
+	PriceValue( numericseries ), 
+	FastLen( numericsimple ),                                             
+	SlowLen( numericsimple ) ;                                             
+
+MACD = XAverage( PriceValue, FastLen ) - XAverage( PriceValue, SlowLen ) ;

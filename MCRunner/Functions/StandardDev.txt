@@ -1,0 +1,12 @@
+inputs: 
+	PriceValue( numericseries ), 
+	Len( numericsimple ), 
+	DataType( numericsimple ) ;                                                
+	                                                                            
+	             
+
+Value1 = VariancePS( PriceValue, Len, DataType ) ;
+if Value1 > 0 then 
+	StandardDev = SquareRoot( Value1 ) 
+else 
+	StandardDev = 0 ;

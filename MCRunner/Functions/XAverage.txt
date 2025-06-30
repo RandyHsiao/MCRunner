@@ -1,0 +1,11 @@
+inputs: 
+	PriceValue( numericseries ), 
+	Len( numericsimple ) ;                                             
+
+variables: 
+	var0( 2 / ( Len + 1 ) ) ;
+
+if CurrentBar = 1 then
+	XAverage = PriceValue
+else
+	XAverage = XAverage[1] + var0 * ( PriceValue - XAverage[1] ) ;

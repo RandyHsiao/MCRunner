@@ -1,0 +1,6 @@
+inputs: 
+	PriceValue( numericseries ), 
+	Len( numericsimple ) ;                                                         
+	                                     
+
+AverageFC = SummationFC( PriceValue, Len ) / Len ;
