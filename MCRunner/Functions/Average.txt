@@ -1,0 +1,5 @@
+inputs: 
+	PriceValue( numericseries ), 
+	Len( numericsimple ) ;                                                
+
+Average = Summation( PriceValue, Len ) / Len ;

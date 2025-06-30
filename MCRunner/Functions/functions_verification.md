@@ -25,18 +25,18 @@
 
 ---
 
-## 📚 Function 對照表（目前已收錄）
+## 📚 Function 對照表（結構與依賴關係補充）
 
-| 功能名稱            | PowerLanguage        | MultiCharts.NET         | 備註或用途                                      |
-|---------------------|----------------------|--------------------------|-------------------------------------------------|
-| ADX                 | `ADX.txt`            | `ADX.cs`                | `Indicator.ADX` 會呼叫 `Function.ADX`         |
-| AverageFC           | `AverageFC.txt`      | `AverageFC.cs`          | 提供給 Bollinger Bands 中心線用               |
-| XAverage            | `XAverage.txt`       | `XAverage.cs`           | 指數加權移動平均 (Wilder EMA), 給 RSI/MACD 用 |
-| SummationFC         | `SummationFC.txt`    | `SummationFC.cs`        | 用於 MACD 中的基礎計算                          |
-| RSI                 | `RSI.txt`            | `RSI.cs`                | 有用到 `XAverage`                               |
-| MACD                | `MACD.txt`           | `MACD.cs`               | 用到 `SummationFC`, `XAverage`, `AverageFC`     |
-| StandardDev         | `StandardDev.txt`    | （對應為 `StdError.cs`） | 無直接命名對應，推測使用 .NET 內建實作         |
-| VariancePS          | `VariancePS.txt`     | 無明確對應               | 可能為 PowerLanguage 專用                      |
+| 功能名稱         | PowerLanguage (`.txt`) | MultiCharts.NET (`.cs`) | 備註與呼叫結構                               |
+|------------------|------------------------|---------------------------|----------------------------------------------|
+| ADX              | `ADX.txt`              | `ADX.cs`                  | 包裝 `DirMovement.ADX[0]` 作為輸出            |
+| AverageFC        | `AverageFC.txt`        | `AverageFC.cs`            | 內部使用 `SummationFC / length` 計算平均     |
+| SummationFC      | `SummationFC.txt`      | `SummationFC.cs`          | 累加 `price[i]` 區間值，供 AverageFC 使用     |
+| XAverage         | `XAverage.txt`         | `XAverage.cs`             | Wilder-style EMA；供 `MACD`, `RSI` 等使用     |
+| MACD             | `MACD.txt`             | `MACD.cs`                 | 使用 `XAverage` 快慢線相減產生值             |
+| RSI              | `RSI.txt`              | `RSI.cs`                  | smoothing 平滑邏輯直接寫入程式，未呼叫 XAverage |
+| StdDev / StdErr  | `StandardDev.txt`      | `StdError.cs`             | 呼叫 MultiCharts 內建 `price.StandardError()` |
+
 
 ---
 

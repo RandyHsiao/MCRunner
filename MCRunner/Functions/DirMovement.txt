@@ -1,0 +1,107 @@
+inputs: 
+	PriceValueH( numericseries ), 
+	PriceValueL( numericseries ), 
+	PriceValueC( numericseries ), 
+	Len( numericsimple ),                                             
+	oDMIPlus( numericref ), 
+	oDMIMinus( numericref ), 
+	oDMI( numericref ), 
+	oADX( numericref ), 
+	oADXR( numericref ),
+	oVolty( numericref ) ;
+
+variables:
+	var0( 0 ), 
+	var1( 0 ), 
+	var2( 0 ), 
+	var3( 0 ),
+	var4( 0 ), 
+	var5( 0 ), 
+	var6( 0 ), 
+	var7( 0 ), 
+	var8( 0 ), 
+	var9( 1 / Len ),                     
+	var10( 0 ) ;
+
+if CurrentBar = 1 then
+	begin
+	for Value1 = 0 to Len - 1 
+		begin
+		var0 = 0 ;
+		var1 = 0 ;
+		var2 = PriceValueH[Value1] - PriceValueH[ Value1 + 1 ] ;
+		var3 = PriceValueL[ Value1 + 1 ] - PriceValueL[Value1] ;
+		condition1 = var2 > var3 and var2 > 0 ;
+		if condition1 then
+			var0 = var2
+		else 
+		begin
+		condition1 = var3 > var2 and var3 > 0 ;
+		if condition1 then
+			var1 = var3 ;
+			end;
+		var4 = var4 + var0 ;
+		var5 = var5 + var1 ;
+		var6 = var6 + TrueRangeCustom( PriceValueH, PriceValueL, PriceValueC )[Value1] ;
+		end ;
+	var7 = var4 / Len ;
+	var8 = var5 / Len ;
+	oVolty = var6 / Len ;
+	end 
+else
+	begin
+	var0 = 0 ;
+	var1 = 0 ;
+	var2 = PriceValueH - PriceValueH[1] ;
+	var3 = PriceValueL[1] - PriceValueL ;
+	condition1 = var2 > var3 and var2 > 0 ;
+	if condition1 then
+		var0 = var2
+	else 
+	begin 
+	condition1 = var3 > var2 and var3 > 0 ;
+	if condition1 then
+		var1 = var3 ;
+		end;
+	var7 = var7[1] + var9 * ( var0 - var7[1] ) ;
+	var8 = var8[1] + var9 * ( var1 - var8[1] ) ;
+	oVolty = oVolty[1] + var9 * ( TrueRangeCustom( PriceValueH, PriceValueL, PriceValueC ) 
+	 - oVolty[1] ) ;
+	end ;
+
+if oVolty > 0 then
+	begin
+	oDMIPlus = 100 * var7 / oVolty ;
+	oDMIMinus = 100 * var8 / oVolty ;
+	end 
+else
+	begin
+	oDMIPlus = 0 ;
+	oDMIMinus = 0 ;
+	end ;
+
+var10 = oDMIPlus + oDMIMinus ;
+if var10 > 0 then
+	oDMI = 100 * AbsValue( oDMIPlus - oDMIMinus ) / var10 
+else
+	oDMI = 0 ;
+
+condition1 = CurrentBar <= Len and CurrentBar > 0 ;
+if condition1 then
+	begin
+	oADX = Cum( oDMI ) / CurrentBar ;
+	                                                                              
+	                                                                               
+	                                                                 
+	                                                                           
+	                               
+	oADXR = ( oADX + oADX[ CurrentBar - 1 ] ) * .5 ;
+	                                                                                 
+	end
+else
+	begin
+	oADX = oADX[1] + var9 * ( oDMI - oADX[1] ) ;
+	oADXR = ( oADX + oADX[ Len - 1 ] ) * .5 ;
+	end ;
+
+DirMovement = 1 ;

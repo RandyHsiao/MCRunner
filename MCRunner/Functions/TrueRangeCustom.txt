@@ -1,0 +1,12 @@
+inputs: PriceValueH( numericsimple ), PriceValueL( numericsimple ), PriceValueC( numericseries ) ;
+variables: var0( 0 ), var1( 0 ) ;
+
+var0 = PriceValueH ;
+var1 = PriceValueL ;
+
+if PriceValueC[1] > PriceValueH then 
+	var0 = PriceValueC[1] 
+else if PriceValueC[1] < PriceValueL then
+	var1 = PriceValueC[1] ;
+
+TrueRangeCustom = var0 - var1 ;
